@@ -1,0 +1,262 @@
+/* UserPreferences.css */
+
+.preferences-container {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+@media (min-width: 640px) {
+  .preferences-container {
+    padding: 2rem;
+  }
+}
+
+/* Header */
+.preferences-header {
+  margin-bottom: 2rem;
+}
+
+.preferences-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .preferences-title {
+    font-size: 1.875rem;
+  }
+}
+
+/* Categories Grid */
+.categories-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 480px) {
+  .categories-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .categories-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* Category Items */
+.category-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.category-item:hover {
+  border-color: #6366f1;
+  background-color: #f9fafb;
+}
+
+/* Custom Checkbox */
+.checkbox-wrapper {
+  position: relative;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+.checkbox-input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.checkbox-display {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 2px solid #d1d5db;
+  border-radius: 0.25rem;
+  background-color: white;
+  transition: all 0.2s ease;
+}
+
+.checkbox-input:checked + .checkbox-display {
+  background-color: #6366f1;
+  border-color: #6366f1;
+}
+
+.checkbox-input:checked + .checkbox-display::after {
+  content: '';
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  width: 0.25rem;
+  height: 0.5rem;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+}
+
+.checkbox-input:focus-visible + .checkbox-display {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+}
+
+.category-label {
+  font-size: 0.875rem;
+  color: #374151;
+  font-weight: 500;
+}
+
+/* Save Button */
+.save-button {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  background-color: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+@media (min-width: 640px) {
+  .save-button {
+    width: auto;
+  }
+}
+
+.save-button:hover:not(:disabled) {
+  background-color: #4f46e5;
+  transform: translateY(-1px);
+}
+
+.save-button:active {
+  transform: translateY(0);
+}
+
+.save-button:disabled {
+  background-color: #c7d2fe;
+  cursor: not-allowed;
+}
+
+/* Loading State */
+.save-button.loading {
+  position: relative;
+  color: transparent;
+}
+
+.save-button.loading::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid white;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 0.8s linear infinite;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* Success Message */
+.success-message {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background-color: #ecfdf5;
+  border-left: 4px solid #10b981;
+  color: #047857;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  .preferences-title {
+    color: #f9fafb;
+  }
+
+  .category-item {
+    background-color: #1f2937;
+    border-color: #374151;
+  }
+
+  .category-item:hover {
+    background-color: #374151;
+    border-color: #6366f1;
+  }
+
+  .category-label {
+    color: #e5e7eb;
+  }
+
+  .checkbox-display {
+    background-color: #111827;
+    border-color: #4b5563;
+  }
+
+  .success-message {
+    background-color: rgba(16, 185, 129, 0.1);
+    border-left-color: #10b981;
+    color: #34d399;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .category-item,
+  .checkbox-display,
+  .save-button {
+    transition: none;
+  }
+
+  .save-button:hover {
+    transform: none;
+  }
+
+  .save-button.loading::after {
+    animation: none;
+  }
+
+  .success-message {
+    animation: none;
+  }
+}

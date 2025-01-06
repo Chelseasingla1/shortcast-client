@@ -1,57 +1,56 @@
+// src/components/playlist/PlaylistManager.js
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchPlaylists, createPlaylist, deletePlaylist, updatePlaylist } from '../../services/api';
+import { fetchPlaylists, createPlaylist, updatePlaylist, deletePlaylist } from '../../services/api';
 import '../../styles/PlaylistManager.css';
 
 function PlaylistManager() {
   const [newPlaylistName, setNewPlaylistName] = useState('');
   const [editingPlaylist, setEditingPlaylist] = useState(null);
   const [editName, setEditName] = useState('');
+  const [error, setError] = useState('');
   const queryClient = useQueryClient();
 
-  const { data: playlists = [] } = useQuery({
+  // Query for fetching playlists
+  const { data: playlists = [], isLoading } = useQuery({
     queryKey: ['playlists'],
-    queryFn: fetchPlaylists
+    queryFn: fetchPlaylists,
+    onError: (err) => setError(err.message)
   });
 
+  // Mutation for creating playlist
   const createMutation = useMutation({
     mutationFn: createPlaylist,
     onSuccess: () => {
       setNewPlaylistName('');
       queryClient.invalidateQueries({ queryKey: ['playlists'] });
-    }
+    },
+    onError: (err) => setError(err.message)
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: deletePlaylist,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['playlists'] });
-    }
-  });
-
+  // Mutation for updating playlist
   const updateMutation = useMutation({
     mutationFn: updatePlaylist,
     onSuccess: () => {
       setEditingPlaylist(null);
       queryClient.invalidateQueries({ queryKey: ['playlists'] });
-    }
+    },
+    onError: (err) => setError(err.message)
+  });
+
+  // Mutation for deleting playlist
+  const deleteMutation = useMutation({
+    mutationFn: deletePlaylist,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['playlists'] });
+    },
+    onError: (err) => setError(err.message)
   });
 
   const handleCreatePlaylist = () => {
     if (newPlaylistName.trim()) {
       createMutation.mutate({ name: newPlaylistName });
     }
-  };
-
-  const handleDeletePlaylist = (playlistId) => {
-    if (window.confirm('Are you sure you want to delete this playlist?')) {
-      deleteMutation.mutate(playlistId);
-    }
-  };
-
-  const startEditing = (playlist) => {
-    setEditingPlaylist(playlist);
-    setEditName(playlist.name);
   };
 
   const handleUpdatePlaylist = () => {
@@ -63,8 +62,30 @@ function PlaylistManager() {
     }
   };
 
+  const handleDeletePlaylist = (playlistId) => {
+    if (window.confirm('Are you sure you want to delete this playlist?')) {
+      deleteMutation.mutate(playlistId);
+    }
+  };
+
+  if (isLoading) {
+    return <div className="text-center py-4">Loading playlists...</div>;
+  }
+
   return (
     <div className="playlist-container">
+      {error && (
+        <div className="error-message mb-4">
+          {error}
+          <button 
+            onClick={() => setError('')}
+            className="ml-2 text-sm text-red-700 hover:text-red-900"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       <div className="playlist-header">
         <h2 className="playlist-title">Your Playlists</h2>
       </div>
@@ -120,7 +141,10 @@ function PlaylistManager() {
                   <div className="playlist-actions">
                     <button 
                       className="action-button edit-button"
-                      onClick={() => startEditing(playlist)}
+                      onClick={() => {
+                        setEditingPlaylist(playlist);
+                        setEditName(playlist.name);
+                      }}
                     >
                       Edit
                     </button>

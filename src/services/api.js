@@ -199,38 +199,7 @@ let mockPlaylists = [
 ];
 
 // Fetch all playlists
-export const fetchPlaylists = async () => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  return mockPlaylists;
-};
 
-// Create a new playlist
-export const createPlaylist = async ({ name }) => {
-  await new Promise(resolve => setTimeout(resolve, 500));
-  const newPlaylist = {
-    id: Date.now(),
-    name,
-    podcasts: []
-  };
-  mockPlaylists = [...mockPlaylists, newPlaylist];
-  return newPlaylist;
-};
-
-// Update a playlist
-export const updatePlaylist = async ({ id, name }) => {
-  await new Promise(resolve => setTimeout(resolve, 500));
-  mockPlaylists = mockPlaylists.map(playlist =>
-    playlist.id === id ? { ...playlist, name } : playlist
-  );
-  return mockPlaylists.find(playlist => playlist.id === id);
-};
-
-// Delete a playlist
-export const deletePlaylist = async (id) => {
-  await new Promise(resolve => setTimeout(resolve, 500));
-  mockPlaylists = mockPlaylists.filter(playlist => playlist.id !== id);
-};
 
 // Add a podcast to a playlist
 export const addPodcastToPlaylist = async ({ playlistId, podcast }) => {
@@ -255,4 +224,96 @@ export const removePodcastFromPlaylist = async ({ playlistId, podcastId }) => {
       : playlist
   );
   return mockPlaylists.find(playlist => playlist.id === playlistId);
+};
+
+// src/services/api.js
+
+const API_BASE_URL = 'http://localhost:3001/api/v1';
+
+// Function to handle fetch errors
+const handleResponse = async (response) => {
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.message || 'API request failed');
+  }
+  return response.json();
+};
+
+// Playlist functions
+export const fetchPlaylists = async () => {
+  const response = await fetch(`${API_BASE_URL}/playlists`);
+  return handleResponse(response);
+};
+
+export const createPlaylist = async ({ name }) => {
+  const response = await fetch(`${API_BASE_URL}/playlists`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ name })
+  });
+  return handleResponse(response);
+};
+
+export const updatePlaylist = async ({ id, name }) => {
+  const response = await fetch(`${API_BASE_URL}/playlists/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ name })
+  });
+  return handleResponse(response);
+};
+
+export const deletePlaylist = async (id) => {
+  const response = await fetch(`${API_BASE_URL}/playlists/${id}`, {
+    method: 'DELETE'
+  });
+  if (!response.ok) {
+    throw new Error('Failed to delete playlist');
+  }
+};
+
+// Episodes functions
+export const fetchEpisodes = async () => {
+  const response = await fetch(`${API_BASE_URL}/episodes`);
+  return handleResponse(response);
+};
+
+export const addEpisodeToPlaylist = async (playlistId, episodeId) => {
+  const response = await fetch(`${API_BASE_URL}/playlists/${playlistId}/episodes`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ episodeId })
+  });
+  return handleResponse(response);
+};
+
+// Favorites functions
+export const addToFavorites = async (type, itemId) => {
+  const response = await fetch(`${API_BASE_URL}/favourites`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ type, itemId })
+  });
+  return handleResponse(response);
+};
+
+export const removeFromFavorites = async (type, itemId) => {
+  const response = await fetch(`${API_BASE_URL}/favourites`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ type, itemId })
+  });
+  if (!response.ok) {
+    throw new Error('Failed to remove from favorites');
+  }
 };
